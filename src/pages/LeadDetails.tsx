@@ -794,28 +794,45 @@ const LeadDetailsPage = () => {
                   <div>
                     <h2 className="text-lg font-semibold">Pré-visualização de logos</h2>
                     <p className="text-sm text-muted-foreground">
-                      No futuro, as variações de logo geradas pela IA aparecerão aqui.
+                      As variações de logo geradas pela IA aparecerão aqui. Clique para abrir em outra aba ou fazer download.
                     </p>
                   </div>
                 </div>
 
                 {generatedLogos.length === 0 ? (
                   <div className="flex h-40 items-center justify-center rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 px-4 text-center text-sm text-muted-foreground">
-                    Defina o brief, cores e estilo ao lado e clique em &quot;Gerar logos&quot;. Em breve, esta seção mostrará opções de
-                    logo para a {lead.company_name}.
+                    Defina o brief, cores e estilo ao lado e clique em &quot;Gerar logos&quot;. As variações geradas aparecerão aqui.
                   </div>
                 ) : (
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
                     {generatedLogos.map((logo, index) => (
                       <div
                         key={index}
-                        className="flex flex-col items-center justify-center rounded-lg border bg-background p-4 text-center text-xs text-muted-foreground"
+                        className="flex flex-col items-stretch rounded-lg border bg-background p-4 text-xs text-muted-foreground"
                       >
-                        <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
-                          {lead.company_name.charAt(0).toUpperCase()}
-                        </div>
-                        <span>Variação de logo #{index + 1}</span>
-                        <span className="mt-1 truncate text-[11px] opacity-70">{logo.url}</span>
+                        <img
+                          src={logo.url}
+                          alt={`Logo ${index + 1} - ${lead.company_name}`}
+                          className="mb-3 h-24 w-full rounded-md border bg-muted object-contain"
+                        />
+                        <span className="text-sm font-medium text-foreground">
+                          Variação de logo #{index + 1}
+                        </span>
+                        <a
+                          href={logo.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-2 break-all text-xs text-primary hover:underline"
+                        >
+                          Abrir em nova aba
+                        </a>
+                        <a
+                          href={logo.url}
+                          download
+                          className="mt-2 inline-flex items-center justify-center rounded-md border px-2 py-1 text-xs font-medium text-foreground hover:bg-muted"
+                        >
+                          Baixar PNG
+                        </a>
                       </div>
                     ))}
                   </div>
