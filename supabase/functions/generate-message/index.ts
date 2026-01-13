@@ -47,8 +47,8 @@ serve(async (req) => {
       );
     }
 
-    // Gerar mensagem personalizada com Lovable AI
-    console.log("Gerando mensagem personalizada para lead:", lead.company_name);
+    // Gerar 3 mensagens personalizadas com Lovable AI
+    console.log("Gerando mensagens personalizadas para lead:", lead.company_name);
     
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -74,24 +74,31 @@ REGRAS:
 - Máximo de 3 parágrafos curtos
 - Adequado para email, WhatsApp ou LinkedIn
 
-ESTRUTURA:
+VOCÊ DEVE RETORNAR EXATAMENTE 3 VARIAÇÕES DA MENSAGEM, SEPARADAS POR "---" (três hífens).
+
+Cada variação deve ter um tom ligeiramente diferente:
+1. Tom mais formal e corporativo
+2. Tom mais casual e amigável
+3. Tom direto e focado em resultados
+
+ESTRUTURA DE CADA MENSAGEM:
 1. Abertura personalizada mencionando a empresa
 2. Identificação do problema/oportunidade
 3. Proposta de valor e call-to-action`,
           },
           {
             role: "user",
-            content: `Crie uma mensagem de vendas para:
+            content: `Crie 3 variações de mensagem de vendas para:
 
 Empresa: ${lead.company_name}
 Website atual: ${lead.website || "Não tem website próprio"}
 Score de oportunidade: ${lead.score}/10
 Análise da oportunidade: ${lead.reasoning || "Empresa identificada como oportunidade"}
 
-Crie uma mensagem persuasiva e personalizada focada em vender criação/modernização de website.`,
+Lembre-se: retorne EXATAMENTE 3 mensagens separadas por "---".`,
           },
         ],
-        temperature: 0.7,
+        temperature: 0.8,
       }),
     });
 
@@ -120,21 +127,29 @@ Crie uma mensagem persuasiva e personalizada focada em vender criação/moderniz
     }
 
     const aiData = await aiResponse.json();
-    const message = aiData.choices?.[0]?.message?.content;
+    const fullMessage = aiData.choices?.[0]?.message?.content;
 
-    if (!message) {
+    if (!fullMessage) {
       return new Response(
         JSON.stringify({ error: "Mensagem não gerada" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Salvar a mensagem como uma interação
+    // Separar as 3 variações
+    const messages = fullMessage.split("---").map((m: string) => m.trim()).filter((m: string) => m.length > 0);
+    
+    // Se não conseguir separar em 3, retorna a mensagem completa 3x
+    const finalMessages = messages.length >= 3 
+      ? messages.slice(0, 3) 
+      : [fullMessage, fullMessage, fullMessage];
+
+    // Salvar a primeira mensagem como uma interação
     const { error: insertError } = await supabase.from("lead_interactions").insert({
       lead_id,
       user_id: lead.user_id,
       type: "note",
-      content: `📧 Mensagem gerada pela IA:\n\n${message}`,
+      content: `📧 Mensagens geradas pela IA (3 variações disponíveis)`,
     });
 
     if (insertError) {
@@ -142,7 +157,7 @@ Crie uma mensagem persuasiva e personalizada focada em vender criação/moderniz
     }
 
     return new Response(
-      JSON.stringify({ message }),
+      JSON.stringify({ messages: finalMessages }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
