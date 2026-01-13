@@ -33,16 +33,12 @@ const AuthPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [mode, setMode] = useState<"login" | "signup" | "magic">(
-    (searchParams.get("mode") as "login" | "signup" | "magic") || "login",
+  const [mode, setMode] = useState<"login" | "magic">(
+    (searchParams.get("mode") as "login" | "magic") || "login",
   );
   const [loading, setLoading] = useState(false);
 
   const loginForm = useForm<LoginValues>({ resolver: zodResolver(loginSchema), defaultValues: { email: "", password: "" } });
-  const signupForm = useForm<SignupValues>({
-    resolver: zodResolver(signupSchema),
-    defaultValues: { email: "", password: "", confirmPassword: "" },
-  });
   const magicForm = useForm<MagicLinkValues>({ resolver: zodResolver(magicLinkSchema), defaultValues: { email: "" } });
 
   const handleLogin = async (values: LoginValues) => {
@@ -62,30 +58,6 @@ const AuthPage = () => {
     navigate("/dashboard", { replace: true });
   };
 
-  const handleSignup = async (values: SignupValues) => {
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email: values.email,
-      password: values.password,
-      options: { emailRedirectTo: window.location.origin },
-    });
-    setLoading(false);
-
-    if (error) {
-      toast({
-        title: "Erro ao criar conta",
-        description: error.message,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    toast({
-      title: "Conta criada",
-      description: "Enviamos um e-mail para confirmar seu acesso. Depois é só fazer login.",
-    });
-    setMode("login");
-  };
 
   const handleMagicLink = async (values: MagicLinkValues) => {
     setLoading(true);
@@ -117,11 +89,11 @@ const AuthPage = () => {
           <p className="text-xs font-medium tracking-[0.2em] text-muted-foreground">HUBLY</p>
           <h1 className="text-xl font-semibold">Acesse sua conta</h1>
           <p className="text-xs text-muted-foreground">
-            Entre com e-mail e senha, crie sua conta ou receba um link mágico.
+            Entre com e-mail e senha ou receba um link mágico.
           </p>
         </div>
 
-        <div className="mb-4 grid grid-cols-3 gap-1 text-xs">
+        <div className="mb-4 grid grid-cols-2 gap-1 text-xs">
           <Button
             type="button"
             size="sm"
@@ -130,15 +102,6 @@ const AuthPage = () => {
             onClick={() => setMode("login")}
           >
             Entrar
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant={mode === "signup" ? "default" : "ghost"}
-            className="w-full"
-            onClick={() => setMode("signup")}
-          >
-            Criar conta
           </Button>
           <Button
             type="button"
@@ -182,55 +145,6 @@ const AuthPage = () => {
               />
               <Button type="submit" className="w-full" disabled={loading}>
                 Entrar
-              </Button>
-            </form>
-          </Form>
-        )}
-
-        {mode === "signup" && (
-          <Form {...signupForm}>
-            <form onSubmit={signupForm.handleSubmit(handleSignup)} className="space-y-4">
-              <FormField
-                control={signupForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>E-mail</FormLabel>
-                    <FormControl>
-                      <Input placeholder="voce@empresa.com" type="email" autoComplete="email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={signupForm.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Senha</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Mínimo 6 caracteres" type="password" autoComplete="new-password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={signupForm.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirmar senha</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Repita a senha" type="password" autoComplete="new-password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={loading}>
-                Criar conta
               </Button>
             </form>
           </Form>
