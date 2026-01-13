@@ -126,29 +126,41 @@ const DashboardPage = () => {
   const periodLabel = period === "7d" ? "7 dias" : period === "30d" ? "30 dias" : "90 dias";
 
   return (
-    <div className="min-h-screen px-4 py-10 sm:px-6 lg:px-10">
+    <div className="min-h-screen px-4 pb-10 pt-8 sm:px-8 lg:px-14">
       <div className="mx-auto max-w-6xl space-y-8">
-        <header className="space-y-6 animate-fade-in">
-          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-            <div>
-              <p className="text-xs font-semibold tracking-[0.32em] text-muted-foreground/80">HUBLY • AI FUNIL 2026</p>
-              <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">Dashboard</h1>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Bem-vindo{user?.email ? `, ${user.email}` : ""}. Acompanhe a performance das suas campanhas e do funil de leads em tempo real.
+        <header className="space-y-5 animate-fade-in">
+          <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-start">
+            <div className="space-y-2">
+              <p className="text-[11px] font-semibold tracking-[0.32em] text-muted-foreground/80">
+                HUBLY • AI FUNIL 2026
+              </p>
+              <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Dashboard</h1>
+              <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+                Bem-vindo{user?.email ? `, ${user.email}` : ""}. Acompanhe a performance das suas campanhas e do funil
+                de leads em tempo real.
               </p>
             </div>
-            <div className="flex flex-wrap gap-3">
-              <Button asChild size="lg" className="hover-scale shadow-lg shadow-primary/40">
+            <div className="flex flex-col items-stretch gap-3 sm:items-end">
+              <Button
+                asChild
+                size="lg"
+                className="hover-scale min-w-[200px] justify-center rounded-full px-8 text-sm font-semibold shadow-lg shadow-primary/40"
+              >
                 <a href="/campanhas/nova">Nova campanha</a>
               </Button>
-              <Button variant="outline" size="lg" asChild className="hover-scale">
+              <Button
+                variant="outline"
+                size="lg"
+                asChild
+                className="hover-scale min-w-[200px] justify-center rounded-full border-primary/40 px-8 text-sm"
+              >
                 <a href="/leads">Ver leads</a>
               </Button>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-            <span className="text-xs uppercase tracking-[0.18em]">Período</span>
+          <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+            <span className="text-xs font-medium uppercase tracking-[0.18em]">Período</span>
             <div className="flex gap-1 rounded-full border border-primary/30 bg-background/40 p-1 shadow-sm shadow-primary/30">
               {(["7d", "30d", "90d"] as const).map((p) => (
                 <Button
@@ -157,8 +169,8 @@ const DashboardPage = () => {
                   size="sm"
                   className={
                     period === p
-                      ? "rounded-full px-4 text-xs"
-                      : "rounded-full px-3 text-xs text-muted-foreground hover:bg-primary/10"
+                      ? "rounded-full px-5 text-xs"
+                      : "rounded-full px-4 text-xs text-muted-foreground hover:bg-primary/10"
                   }
                   onClick={() => setPeriod(p)}
                 >
@@ -166,7 +178,9 @@ const DashboardPage = () => {
                 </Button>
               ))}
             </div>
-            <span className="ml-auto text-xs text-muted-foreground/70">Visualizando últimos {periodLabel}</span>
+            <span className="ml-auto text-[11px] text-muted-foreground/70">
+              Visualizando últimos {periodLabel}
+            </span>
           </div>
         </header>
 
