@@ -183,17 +183,6 @@ const LeadDetailsPage = () => {
     addInteraction.mutate();
   };
 
-  const statusOptions = [
-    { value: "new", label: "Novo", color: "bg-gray-500/10 text-gray-600" },
-    { value: "contacted", label: "Contatado", color: "bg-blue-500/10 text-blue-600" },
-    { value: "qualified", label: "Qualificado", color: "bg-green-500/10 text-green-600" },
-    { value: "negotiation", label: "Negociação", color: "bg-yellow-500/10 text-yellow-600" },
-    { value: "won", label: "Ganho", color: "bg-emerald-500/10 text-emerald-600" },
-    { value: "lost", label: "Perdido", color: "bg-red-500/10 text-red-600" },
-  ];
-
-  const currentStatus = statusOptions.find((s) => s.value === lead.status) || statusOptions[0];
-
   if (loadingLead) {
     return (
       <div className="min-h-screen bg-background px-4 py-8">
@@ -216,6 +205,18 @@ const LeadDetailsPage = () => {
       </div>
     );
   }
+
+  const statusOptions = [
+    { value: "new", label: "Novo", color: "bg-gray-500/10 text-gray-600" },
+    { value: "contacted", label: "Contatado", color: "bg-blue-500/10 text-blue-600" },
+    { value: "qualified", label: "Qualificado", color: "bg-green-500/10 text-green-600" },
+    { value: "negotiation", label: "Negociação", color: "bg-yellow-500/10 text-yellow-600" },
+    { value: "won", label: "Ganho", color: "bg-emerald-500/10 text-emerald-600" },
+    { value: "lost", label: "Perdido", color: "bg-red-500/10 text-red-600" },
+  ];
+
+  const currentStatus = statusOptions.find((s) => s.value === lead.status) || statusOptions[0];
+
 
   const typeIcons = {
     note: MessageSquare,
