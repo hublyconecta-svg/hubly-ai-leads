@@ -111,3 +111,15 @@ All colors MUST be HSL.
     @apply rounded-2xl border border-primary/20 bg-gradient-to-br from-background/60 via-background/40 to-primary/10 backdrop-blur-xl shadow-xl;
   }
 }
+
+a[href*="lovable.dev"], 
+iframe[src*="lovable.dev"],
+div[style*="Edit with Lovable"],
+.lovable-badge {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  z-index: -9999 !important;
+}
