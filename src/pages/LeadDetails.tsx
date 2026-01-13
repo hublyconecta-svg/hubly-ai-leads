@@ -32,6 +32,7 @@ import {
   ChevronDown,
   Download,
 } from "lucide-react";
+import { MessageTemplatesModal } from "@/components/MessageTemplatesModal";
 
 interface Lead {
   id: string;
@@ -67,7 +68,8 @@ const LeadDetailsPage = () => {
   const queryClient = useQueryClient();
   const [newNote, setNewNote] = useState("");
   const [interactionType, setInteractionType] = useState<"note" | "email" | "call" | "meeting">("note");
-  const [generatedMessage, setGeneratedMessage] = useState("");
+  const [generatedMessages, setGeneratedMessages] = useState<string[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [siteHtml, setSiteHtml] = useState("");
   const [siteCss, setSiteCss] = useState("");
@@ -165,21 +167,21 @@ const LeadDetailsPage = () => {
       });
 
       if (error) throw error;
-      if (!data?.message) throw new Error("Mensagem não gerada");
+      if (!data?.messages) throw new Error("Mensagens não geradas");
 
-      return data.message;
+      return data.messages as string[];
     },
-    onSuccess: (message) => {
-      setGeneratedMessage(message);
+    onSuccess: (messages) => {
+      setGeneratedMessages(messages);
       queryClient.invalidateQueries({ queryKey: ["lead-interactions", id] });
       toast({
-        title: "Mensagem gerada!",
-        description: "A IA criou uma mensagem personalizada para este lead.",
+        title: "Mensagens geradas!",
+        description: "3 variações de mensagem foram criadas pela IA.",
       });
     },
     onError: (error) => {
       toast({
-        title: "Erro ao gerar mensagem",
+        title: "Erro ao gerar mensagens",
         description: error instanceof Error ? error.message : "Erro desconhecido",
         variant: "destructive",
       });
@@ -271,14 +273,13 @@ const LeadDetailsPage = () => {
     }
   }, [lastLogos, generatedLogos.length]);
 
-  const handleCopyMessage = () => {
-    navigator.clipboard.writeText(generatedMessage);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-    toast({
-      title: "Copiado!",
-      description: "Mensagem copiada para a área de transferência.",
-    });
+  const handleOpenMessageModal = () => {
+    setGeneratedMessages([]);
+    setModalOpen(true);
+  };
+
+  const handleGenerateMessages = () => {
+    generateMessage.mutate();
   };
 
   const handleSubmitNote = (e: React.FormEvent) => {
@@ -483,51 +484,25 @@ const LeadDetailsPage = () => {
 
             {/* Gerador de mensagens com IA */}
             <div className="rounded-xl border border-border bg-card p-6">
-              <div className="mb-4 flex items-center justify-between">
+              <div className="flex items-center justify-between">
                 <div>
                   <h2 className="flex items-center gap-2 text-lg font-semibold">
                     <Sparkles className="h-5 w-5 text-primary" />
-                    Mensagem de vendas gerada por IA
+                    Mensagens de vendas geradas por IA
                   </h2>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Use Lovable AI para criar uma abordagem personalizada
+                    Gere 3 variações de mensagem personalizada com Lovable AI
                   </p>
                 </div>
                 <Button
-                  onClick={() => generateMessage.mutate()}
-                  disabled={generateMessage.isPending}
+                  onClick={handleOpenMessageModal}
                   size="sm"
+                  className="bg-gradient-to-r from-primary via-fuchsia-500 to-cyan-400"
                 >
-                  {generateMessage.isPending ? "Gerando..." : "Gerar mensagem"}
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Gerar Mensagens
                 </Button>
               </div>
-
-              {generatedMessage && (
-                <div className="space-y-3">
-                  <div className="rounded-lg border border-border/60 bg-muted/30 p-4">
-                    <p className="whitespace-pre-wrap text-sm">{generatedMessage}</p>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={handleCopyMessage}>
-                    {copied ? (
-                      <>
-                        <Check className="mr-2 h-4 w-4" />
-                        Copiado!
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="mr-2 h-4 w-4" />
-                        Copiar mensagem
-                      </>
-                    )}
-                  </Button>
-                </div>
-              )}
-
-              {generateMessage.isError && (
-                <p className="text-sm text-destructive">
-                  Erro ao gerar mensagem. Tente novamente.
-                </p>
-              )}
             </div>
 
             {/* Adicionar nova interação */}
@@ -841,6 +816,14 @@ const LeadDetailsPage = () => {
             </div>
           </TabsContent>
         </Tabs>
+
+        <MessageTemplatesModal
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+          messages={generatedMessages}
+          isGenerating={generateMessage.isPending}
+          onGenerate={handleGenerateMessages}
+        />
       </div>
     </div>
   );

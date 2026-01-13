@@ -1,16 +1,23 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/integrations/supabase/AuthContext";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
+import { MessageSquare } from "lucide-react";
+import { MessageTemplatesModal } from "@/components/MessageTemplatesModal";
+import { useToast } from "@/hooks/use-toast";
 
 const LeadsPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterNoWebsite, setFilterNoWebsite] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+  const [generatedMessages, setGeneratedMessages] = useState<string[]>([]);
 
   const { data: leads, isLoading } = useQuery({
     queryKey: ["leads"],
@@ -35,6 +42,45 @@ const LeadsPage = () => {
 
     return matchesSearch && matchesWebsiteFilter;
   });
+
+  const generateMessagesMutation = useMutation({
+    mutationFn: async (leadId: string) => {
+      const { data, error } = await supabase.functions.invoke("generate-message", {
+        body: { lead_id: leadId },
+      });
+
+      if (error) throw error;
+      if (!data?.messages) throw new Error("Mensagens não geradas");
+
+      return data.messages as string[];
+    },
+    onSuccess: (messages) => {
+      setGeneratedMessages(messages);
+      toast({
+        title: "Mensagens geradas!",
+        description: "3 variações de mensagem foram criadas pela IA.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao gerar mensagens",
+        description: error instanceof Error ? error.message : "Erro desconhecido",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleOpenMessageModal = (leadId: string) => {
+    setSelectedLeadId(leadId);
+    setGeneratedMessages([]);
+    setModalOpen(true);
+  };
+
+  const handleGenerateMessages = () => {
+    if (selectedLeadId) {
+      generateMessagesMutation.mutate(selectedLeadId);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background px-4 py-8">
@@ -128,9 +174,19 @@ const LeadsPage = () => {
                       </span>
                     </td>
                     <td className="px-4 py-2">
-                      <Button variant="ghost" size="sm" onClick={() => navigate(`/leads/${lead.id}`)}>
-                        Ver detalhes
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleOpenMessageModal(lead.id)}
+                        >
+                          <MessageSquare className="mr-2 h-4 w-4" />
+                          Mensagens
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => navigate(`/leads/${lead.id}`)}>
+                          Ver detalhes
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -144,6 +200,14 @@ const LeadsPage = () => {
               : "Você ainda não tem leads. Crie uma campanha para começar a gerar leads automaticamente."}
           </div>
         )}
+
+        <MessageTemplatesModal
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+          messages={generatedMessages}
+          isGenerating={generateMessagesMutation.isPending}
+          onGenerate={handleGenerateMessages}
+        />
       </div>
     </div>
   );
