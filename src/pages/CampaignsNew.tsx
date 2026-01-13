@@ -4,20 +4,64 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/integrations/supabase/AuthContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const NewCampaignPage = () => {
   const [name, setName] = useState("");
   const [query, setQuery] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  const createCampaign = useMutation({
+    mutationFn: async () => {
+      if (!user?.id) throw new Error("Usuário não autenticado");
+
+      const { data, error } = await supabase
+        .from("campaigns")
+        .insert({
+          user_id: user.id,
+          name,
+          query,
+          status: "active",
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["campaigns"] });
+      toast({
+        title: "Campanha criada!",
+        description: "Sua campanha foi criada com sucesso.",
+      });
+      navigate("/campanhas");
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao criar campanha",
+        description: error instanceof Error ? error.message : "Erro desconhecido",
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Campanha criada (mock)",
-      description: "No próximo passo vamos salvar campanhas no Supabase.",
-    });
-    navigate("/campanhas");
+    if (!name.trim()) {
+      toast({
+        title: "Nome obrigatório",
+        description: "Por favor, defina um nome para a campanha.",
+        variant: "destructive",
+      });
+      return;
+    }
+    createCampaign.mutate();
   };
 
   return (
@@ -37,6 +81,7 @@ const NewCampaignPage = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Consultorias em São Paulo"
+              required
             />
           </div>
           <div className="space-y-2">
@@ -47,7 +92,9 @@ const NewCampaignPage = () => {
               placeholder='Ex: "consultorias de marketing em SP", "clínicas odontológicas em BH"...'
             />
           </div>
-          <Button type="submit">Criar campanha (mock)</Button>
+          <Button type="submit" disabled={createCampaign.isPending}>
+            {createCampaign.isPending ? "Criando..." : "Criar campanha"}
+          </Button>
         </form>
       </div>
     </div>
