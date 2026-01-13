@@ -15,7 +15,6 @@ import NewCampaignPage from "./pages/CampaignsNew";
 import LeadsPage from "./pages/Leads";
 import LeadDetailsPage from "./pages/LeadDetails";
 import SettingsPage from "./pages/Settings";
-import UpgradePage from "./pages/Upgrade";
 import SuperAdminPage from "./pages/SuperAdmin";
 import { SuperAdminGuard } from "@/components/SuperAdminGuard";
 
@@ -88,16 +87,6 @@ const App = () => (
                 <RequireAuth>
                   <AuthenticatedLayout>
                     <SettingsPage />
-                  </AuthenticatedLayout>
-                </RequireAuth>
-              }
-            />
-            <Route
-              path="/upgrade"
-              element={
-                <RequireAuth>
-                  <AuthenticatedLayout>
-                    <UpgradePage />
                   </AuthenticatedLayout>
                 </RequireAuth>
               }
