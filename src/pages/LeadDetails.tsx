@@ -229,6 +229,19 @@ const LeadDetailsPage = () => {
     },
   });
 
+  useEffect(() => {
+    if (lead?.lead_sites && !siteHtml && !siteCss) {
+      const lastLeadSite = [...lead.lead_sites].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      )[0];
+
+      if (lastLeadSite) {
+        setSiteHtml(lastLeadSite.html);
+        setSiteCss(lastLeadSite.css);
+      }
+    }
+  }, [lead, siteHtml, siteCss]);
+
   const handleCopyMessage = () => {
     navigator.clipboard.writeText(generatedMessage);
     setCopied(true);
@@ -285,17 +298,6 @@ const LeadDetailsPage = () => {
   ];
 
   const currentStatus = statusOptions.find((s) => s.value === lead.status) || statusOptions[0];
-
-  const lastLeadSite = lead.lead_sites?.sort(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-  )[0];
-
-  useEffect(() => {
-    if (lastLeadSite && !siteHtml && !siteCss) {
-      setSiteHtml(lastLeadSite.html);
-      setSiteCss(lastLeadSite.css);
-    }
-  }, [lastLeadSite, siteHtml, siteCss]);
   const typeIcons = {
     note: MessageSquare,
     email: Mail,
