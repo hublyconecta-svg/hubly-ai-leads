@@ -7,6 +7,13 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/Auth";
 import { AuthProvider } from "@/integrations/supabase/AuthContext";
+import { RequireAuth } from "@/components/RequireAuth";
+import DashboardPage from "./pages/Dashboard";
+import CampaignsPage from "./pages/Campaigns";
+import NewCampaignPage from "./pages/CampaignsNew";
+import LeadsPage from "./pages/Leads";
+import SettingsPage from "./pages/Settings";
+import UpgradePage from "./pages/Upgrade";
 
 const queryClient = new QueryClient();
 
@@ -20,7 +27,56 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
-            {/* Rotas protegidas serão adicionadas aqui futuramente usando <RequireAuth> */}
+
+            <Route
+              path="/dashboard"
+              element={
+                <RequireAuth>
+                  <DashboardPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/campanhas"
+              element={
+                <RequireAuth>
+                  <CampaignsPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/campanhas/nova"
+              element={
+                <RequireAuth>
+                  <NewCampaignPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/leads"
+              element={
+                <RequireAuth>
+                  <LeadsPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <RequireAuth>
+                  <SettingsPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/upgrade"
+              element={
+                <RequireAuth>
+                  <UpgradePage />
+                </RequireAuth>
+              }
+            />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
