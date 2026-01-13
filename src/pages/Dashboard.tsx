@@ -126,63 +126,70 @@ const DashboardPage = () => {
   const periodLabel = period === "7d" ? "7 dias" : period === "30d" ? "30 dias" : "90 dias";
 
   return (
-    <div className="min-h-screen bg-background px-4 py-8">
-      <div className="mx-auto max-w-5xl space-y-6">
-        <header className="space-y-4">
-          <div className="flex items-center justify-between">
+    <div className="min-h-screen px-4 py-10 sm:px-6 lg:px-10">
+      <div className="mx-auto max-w-6xl space-y-8">
+        <header className="space-y-6 animate-fade-in">
+          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
             <div>
-              <p className="text-xs font-medium tracking-[0.2em] text-muted-foreground">HUBLY</p>
-              <h1 className="text-2xl font-semibold">Dashboard</h1>
-              <p className="text-sm text-muted-foreground">
-                Bem-vindo{user?.email ? `, ${user.email}` : ""}. Aqui você verá o resumo das suas campanhas e leads.
+              <p className="text-xs font-semibold tracking-[0.32em] text-muted-foreground/80">HUBLY • AI FUNIL 2026</p>
+              <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">Dashboard</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Bem-vindo{user?.email ? `, ${user.email}` : ""}. Acompanhe a performance das suas campanhas e do funil de leads em tempo real.
               </p>
             </div>
-            <div className="flex gap-2">
-              <Button asChild size="sm">
+            <div className="flex flex-wrap gap-3">
+              <Button asChild size="lg" className="hover-scale shadow-lg shadow-primary/40">
                 <a href="/campanhas/nova">Nova campanha</a>
               </Button>
-              <Button variant="outline" size="sm" asChild>
+              <Button variant="outline" size="lg" asChild className="hover-scale">
                 <a href="/leads">Ver leads</a>
               </Button>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Período:</span>
-            <div className="flex gap-1">
+          <div className="flex items-center gap-3 text-sm text-muted-foreground">
+            <span className="text-xs uppercase tracking-[0.18em]">Período</span>
+            <div className="flex gap-1 rounded-full border border-primary/30 bg-background/40 p-1 shadow-sm shadow-primary/30">
               {(["7d", "30d", "90d"] as const).map((p) => (
                 <Button
                   key={p}
-                  variant={period === p ? "default" : "outline"}
+                  variant={period === p ? "default" : "ghost"}
                   size="sm"
+                  className={
+                    period === p
+                      ? "rounded-full px-4 text-xs"
+                      : "rounded-full px-3 text-xs text-muted-foreground hover:bg-primary/10"
+                  }
                   onClick={() => setPeriod(p)}
                 >
                   {p === "7d" ? "7 dias" : p === "30d" ? "30 dias" : "90 dias"}
                 </Button>
               ))}
             </div>
+            <span className="ml-auto text-xs text-muted-foreground/70">Visualizando últimos {periodLabel}</span>
           </div>
         </header>
 
-        <main className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-xs text-muted-foreground">Leads gerados este mês</p>
-            <p className="mt-2 text-2xl font-semibold">
+        <main className="grid gap-5 md:grid-cols-3">
+          <div className="glass-card animate-fade-in">
+            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground/70">Leads gerados</p>
+            <p className="mt-3 font-mono text-3xl font-semibold text-primary">
               {loadingLeads ? "..." : leadsCount}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              {leadsCount === 0 ? "Crie sua primeira campanha" : "Total de leads"}
+              {leadsCount === 0 ? "Crie sua primeira campanha" : "Total de leads cadastrados"}
             </p>
           </div>
-          <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-xs text-muted-foreground">Campanhas ativas</p>
-            <p className="mt-2 text-2xl font-semibold">
+          <div className="glass-card animate-fade-in [animation-delay:60ms]">
+            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground/70">Campanhas ativas</p>
+            <p className="mt-3 font-mono text-3xl font-semibold text-secondary">
               {loadingCampaigns ? "..." : activeCampaigns}
             </p>
+            <p className="mt-1 text-xs text-muted-foreground">Campanhas com leads em andamento</p>
           </div>
-          <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-xs text-muted-foreground">Créditos restantes</p>
-            <p className="mt-2 text-2xl font-semibold">50</p>
+          <div className="glass-card animate-fade-in [animation-delay:120ms]">
+            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground/70">Créditos</p>
+            <p className="mt-3 font-mono text-3xl font-semibold text-accent">50</p>
             <p className="mt-1 text-xs text-muted-foreground">Plano Free (mock)</p>
           </div>
         </main>
