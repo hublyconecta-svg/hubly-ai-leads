@@ -16,11 +16,12 @@ const NewCampaignPage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const createCampaign = useMutation({
+  const createCampaignAndGenerateLeads = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("Usuário não autenticado");
 
-      const { data, error } = await supabase
+      // 1. Criar a campanha
+      const { data: campaign, error: campaignError } = await supabase
         .from("campaigns")
         .insert({
           user_id: user.id,
@@ -31,14 +32,29 @@ const NewCampaignPage = () => {
         .select()
         .single();
 
-      if (error) throw error;
-      return data;
+      if (campaignError) throw campaignError;
+
+      // 2. Chamar edge function para gerar leads
+      const { data: leadsData, error: leadsError } = await supabase.functions.invoke("generate-leads", {
+        body: {
+          campaign_id: campaign.id,
+          query,
+        },
+      });
+
+      if (leadsError) throw leadsError;
+
+      return { campaign, leadsData };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["campaigns"] });
+      queryClient.invalidateQueries({ queryKey: ["leads"] });
+      
+      const leadsCount = data.leadsData?.leads_created || 0;
+      
       toast({
         title: "Campanha criada!",
-        description: "Sua campanha foi criada com sucesso.",
+        description: `${leadsCount} leads foram gerados e qualificados com IA.`,
       });
       navigate("/campanhas");
     },
@@ -61,7 +77,15 @@ const NewCampaignPage = () => {
       });
       return;
     }
-    createCampaign.mutate();
+    if (!query.trim()) {
+      toast({
+        title: "Busca obrigatória",
+        description: "Por favor, defina uma busca para encontrar leads.",
+        variant: "destructive",
+      });
+      return;
+    }
+    createCampaignAndGenerateLeads.mutate();
   };
 
   return (
@@ -70,7 +94,7 @@ const NewCampaignPage = () => {
         <header>
           <h1 className="text-2xl font-semibold">Nova campanha</h1>
           <p className="text-sm text-muted-foreground">
-            Defina um nome e uma busca base. A integração real com Serper e IA será adicionada depois.
+            Defina um nome e uma busca. A IA vai encontrar e qualificar leads automaticamente usando Serper + Gemini.
           </p>
         </header>
 
@@ -82,6 +106,7 @@ const NewCampaignPage = () => {
               onChange={(e) => setName(e.target.value)}
               placeholder="Consultorias em São Paulo"
               required
+              disabled={createCampaignAndGenerateLeads.isPending}
             />
           </div>
           <div className="space-y-2">
@@ -90,11 +115,21 @@ const NewCampaignPage = () => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder='Ex: "consultorias de marketing em SP", "clínicas odontológicas em BH"...'
+              required
+              disabled={createCampaignAndGenerateLeads.isPending}
             />
+            <p className="text-xs text-muted-foreground">
+              💡 Dica: Seja específico na busca para obter leads mais relevantes
+            </p>
           </div>
-          <Button type="submit" disabled={createCampaign.isPending}>
-            {createCampaign.isPending ? "Criando..." : "Criar campanha"}
+          <Button type="submit" disabled={createCampaignAndGenerateLeads.isPending}>
+            {createCampaignAndGenerateLeads.isPending ? "Gerando leads..." : "Criar campanha e gerar leads"}
           </Button>
+          {createCampaignAndGenerateLeads.isPending && (
+            <p className="text-xs text-muted-foreground">
+              ⏳ Buscando e qualificando leads com IA... isso pode levar alguns segundos.
+            </p>
+          )}
         </form>
       </div>
     </div>
