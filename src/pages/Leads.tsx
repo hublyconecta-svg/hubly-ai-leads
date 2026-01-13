@@ -101,12 +101,30 @@ const LeadsPage = () => {
                     <td className="px-4 py-2">
                       <span
                         className={`inline-block rounded-full px-2 py-1 text-xs ${
-                          lead.status === "qualified"
+                          lead.status === "won"
+                            ? "bg-emerald-500/10 text-emerald-600"
+                            : lead.status === "qualified"
                             ? "bg-green-500/10 text-green-600"
+                            : lead.status === "negotiation"
+                            ? "bg-yellow-500/10 text-yellow-600"
+                            : lead.status === "contacted"
+                            ? "bg-blue-500/10 text-blue-600"
+                            : lead.status === "lost"
+                            ? "bg-red-500/10 text-red-600"
                             : "bg-gray-500/10 text-gray-600"
                         }`}
                       >
-                        {lead.status === "qualified" ? "Qualificado" : lead.status}
+                        {lead.status === "won"
+                          ? "Ganho"
+                          : lead.status === "qualified"
+                          ? "Qualificado"
+                          : lead.status === "negotiation"
+                          ? "Negociação"
+                          : lead.status === "contacted"
+                          ? "Contatado"
+                          : lead.status === "lost"
+                          ? "Perdido"
+                          : "Novo"}
                       </span>
                     </td>
                     <td className="px-4 py-2">
