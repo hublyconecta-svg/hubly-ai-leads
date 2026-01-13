@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ArrowLeft,
   Building2,
@@ -50,6 +50,15 @@ interface Interaction {
   created_at: string;
 }
 
+interface LeadSite {
+  id: string;
+  lead_id: string;
+  html: string;
+  css: string;
+  meta: any | null;
+  created_at: string;
+}
+
 const LeadDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
@@ -66,16 +75,16 @@ const LeadDetailsPage = () => {
   const [siteTone, setSiteTone] = useState("Profissional e consultivo");
   const [primaryColor, setPrimaryColor] = useState("#3b82f6");
   const [sections, setSections] = useState("Hero, Sobre, Serviços, Depoimentos, Contato");
-  const { data: lead, isLoading: loadingLead } = useQuery<Lead>({
+  const { data: lead, isLoading: loadingLead } = useQuery<Lead & { lead_sites?: LeadSite[] }>({
     queryKey: ["lead", id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("leads")
-        .select("*")
+        .select("*, lead_sites(*)")
         .eq("id", id)
         .single();
       if (error) throw error;
-      return data;
+      return data as Lead & { lead_sites?: LeadSite[] };
     },
     enabled: !!user && !!id,
   });
@@ -276,6 +285,17 @@ const LeadDetailsPage = () => {
   ];
 
   const currentStatus = statusOptions.find((s) => s.value === lead.status) || statusOptions[0];
+
+  const lastLeadSite = lead.lead_sites?.sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+  )[0];
+
+  useEffect(() => {
+    if (lastLeadSite && !siteHtml && !siteCss) {
+      setSiteHtml(lastLeadSite.html);
+      setSiteCss(lastLeadSite.css);
+    }
+  }, [lastLeadSite, siteHtml, siteCss]);
   const typeIcons = {
     note: MessageSquare,
     email: Mail,

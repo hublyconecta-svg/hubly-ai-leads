@@ -79,6 +79,47 @@ export type Database = {
           },
         ]
       }
+      lead_sites: {
+        Row: {
+          created_at: string
+          css: string
+          html: string
+          id: string
+          lead_id: string
+          meta: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          css: string
+          html: string
+          id?: string
+          lead_id: string
+          meta?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          css?: string
+          html?: string
+          id?: string
+          lead_id?: string
+          meta?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_sites_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           campaign_id: string
