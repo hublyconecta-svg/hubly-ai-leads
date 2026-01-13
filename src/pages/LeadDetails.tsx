@@ -75,6 +75,13 @@ const LeadDetailsPage = () => {
   const [siteTone, setSiteTone] = useState("Profissional e consultivo");
   const [primaryColor, setPrimaryColor] = useState("#3b82f6");
   const [sections, setSections] = useState("Hero, Sobre, Serviços, Depoimentos, Contato");
+  const [logoBrief, setLogoBrief] = useState(
+    "Logo moderna para a clínica, transmitindo confiança, tecnologia e cuidado com o sorriso.",
+  );
+  const [logoColors, setLogoColors] = useState("#0ea5e9, #0f172a");
+  const [logoStyle, setLogoStyle] = useState("Minimalista, clean, focada em tipografia");
+  const [generatedLogos, setGeneratedLogos] = useState<string[]>([]);
+  const [isGeneratingLogos, setIsGeneratingLogos] = useState(false);
   const { data: lead, isLoading: loadingLead } = useQuery<Lead & { lead_sites?: LeadSite[] }>({
     queryKey: ["lead", id],
     queryFn: async () => {
@@ -370,6 +377,7 @@ const LeadDetailsPage = () => {
           <TabsList>
             <TabsTrigger value="resumo">Resumo</TabsTrigger>
             <TabsTrigger value="motor-proprio">Motor próprio</TabsTrigger>
+            <TabsTrigger value="gerador-logos">Gerador de logos</TabsTrigger>
           </TabsList>
 
           <TabsContent value="resumo" className="space-y-6">
@@ -669,6 +677,102 @@ const LeadDetailsPage = () => {
                         <code>{siteCss}</code>
                       </pre>
                     </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="gerador-logos" className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1.2fr)]">
+              {/* Coluna esquerda: formulário de configuração */}
+              <div className="space-y-4 rounded-xl border border-border bg-card p-4 md:p-6">
+                <h2 className="text-lg font-semibold">Configurações do logo</h2>
+                <p className="text-sm text-muted-foreground">
+                  Descreva como deve ser o logo da {lead.company_name} e quais cores/estilo você prefere.
+                </p>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Brief do logo</label>
+                  <Textarea
+                    value={logoBrief}
+                    onChange={(e) => setLogoBrief(e.target.value)}
+                    placeholder="Ex.: Logo moderna para clínica odontológica em Curitiba, transmitindo confiança, tecnologia e cuidado."
+                    rows={4}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Cores desejadas</label>
+                  <Input
+                    value={logoColors}
+                    onChange={(e) => setLogoColors(e.target.value)}
+                    placeholder="#0ea5e9, #0f172a"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Você pode usar hex (#0ea5e9) ou descrever as cores (azul, branco, cinza escuro).
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Estilo visual</label>
+                  <Input
+                    value={logoStyle}
+                    onChange={(e) => setLogoStyle(e.target.value)}
+                    placeholder="Minimalista, premium, sofisticado, focado em tipografia"
+                  />
+                </div>
+
+                <Button
+                  type="button"
+                  disabled={isGeneratingLogos}
+                  onClick={() => {
+                    setIsGeneratingLogos(true);
+                    setTimeout(() => {
+                      setGeneratedLogos(["variação 1", "variação 2", "variação 3"]);
+                      setIsGeneratingLogos(false);
+                      toast({
+                        title: "Em breve",
+                        description:
+                          "A geração automática de logos via IA será integrada aqui. Por enquanto, use esta aba para definir o briefing.",
+                      });
+                    }, 800);
+                  }}
+                >
+                  {isGeneratingLogos ? "Gerando..." : "Gerar logos (em breve via IA)"}
+                </Button>
+              </div>
+
+              {/* Coluna direita: visualização de logos */}
+              <div className="space-y-4 rounded-xl border border-border bg-card p-4 md:p-6">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <h2 className="text-lg font-semibold">Pré-visualização de logos</h2>
+                    <p className="text-sm text-muted-foreground">
+                      No futuro, as variações de logo geradas pela IA aparecerão aqui.
+                    </p>
+                  </div>
+                </div>
+
+                {generatedLogos.length === 0 ? (
+                  <div className="flex h-40 items-center justify-center rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 px-4 text-center text-sm text-muted-foreground">
+                    Defina o brief, cores e estilo ao lado e clique em &quot;Gerar logos&quot;. Em breve, esta seção mostrará opções de
+                    logo para a {lead.company_name}.
+                  </div>
+                ) : (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {generatedLogos.map((logo, index) => (
+                      <div
+                        key={index}
+                        className="flex flex-col items-center justify-center rounded-lg border bg-background p-4 text-center text-xs text-muted-foreground"
+                      >
+                        <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          {lead.company_name.charAt(0).toUpperCase()}
+                        </div>
+                        <span>Variação de logo #{index + 1}</span>
+                        <span className="mt-1 truncate text-[11px] opacity-70">{logo}</span>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
