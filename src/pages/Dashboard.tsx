@@ -35,6 +35,26 @@ const DashboardPage = () => {
   const activeCampaigns = campaigns?.filter((c) => c.status === "active").length ?? 0;
   const leadsCount = leads?.length ?? 0;
 
+  // Contar leads por status para o funil
+  const leadsByStatus = {
+    new: leads?.filter((l) => l.status === "new").length ?? 0,
+    contacted: leads?.filter((l) => l.status === "contacted").length ?? 0,
+    qualified: leads?.filter((l) => l.status === "qualified").length ?? 0,
+    negotiation: leads?.filter((l) => l.status === "negotiation").length ?? 0,
+    won: leads?.filter((l) => l.status === "won").length ?? 0,
+    lost: leads?.filter((l) => l.status === "lost").length ?? 0,
+  };
+
+  const funnelStages = [
+    { label: "Novos", count: leadsByStatus.new, color: "bg-gray-500" },
+    { label: "Contatados", count: leadsByStatus.contacted, color: "bg-blue-500" },
+    { label: "Qualificados", count: leadsByStatus.qualified, color: "bg-green-500" },
+    { label: "Negociação", count: leadsByStatus.negotiation, color: "bg-yellow-500" },
+    { label: "Ganhos", count: leadsByStatus.won, color: "bg-emerald-500" },
+  ];
+
+  const totalActive = leadsByStatus.new + leadsByStatus.contacted + leadsByStatus.qualified + leadsByStatus.negotiation;
+
   return (
     <div className="min-h-screen bg-background px-4 py-8">
       <div className="mx-auto max-w-5xl space-y-6">
@@ -78,6 +98,42 @@ const DashboardPage = () => {
             <p className="mt-1 text-xs text-muted-foreground">Plano Free (mock)</p>
           </div>
         </main>
+
+        {/* Funil de vendas */}
+        {totalActive > 0 && (
+          <section className="rounded-xl border border-border bg-card p-6">
+            <h2 className="mb-4 text-lg font-semibold">Funil de vendas</h2>
+            <div className="space-y-3">
+              {funnelStages.map((stage, index) => {
+                const percentage = totalActive > 0 ? (stage.count / totalActive) * 100 : 0;
+                return (
+                  <div key={stage.label}>
+                    <div className="mb-1 flex items-center justify-between text-sm">
+                      <span className="font-medium">{stage.label}</span>
+                      <span className="text-muted-foreground">
+                        {stage.count} ({percentage.toFixed(0)}%)
+                      </span>
+                    </div>
+                    <div className="h-8 overflow-hidden rounded-lg bg-muted">
+                      <div
+                        className={`h-full ${stage.color} flex items-center justify-center text-xs font-medium text-white transition-all duration-500`}
+                        style={{ width: `${Math.max(percentage, 5)}%` }}
+                      >
+                        {stage.count > 0 && stage.count}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-4 rounded-lg bg-muted/30 p-3 text-sm">
+              <p className="text-muted-foreground">
+                <span className="font-semibold text-red-600">{leadsByStatus.lost} leads perdidos</span> não são
+                contabilizados no funil
+              </p>
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

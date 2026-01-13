@@ -3,10 +3,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/integrations/supabase/AuthContext";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
-import { ArrowLeft, Building2, Globe, Star, Calendar, MessageSquare, Phone, Mail, User, Sparkles, Copy, Check } from "lucide-react";
+import { ArrowLeft, Building2, Globe, Star, Calendar, MessageSquare, Phone, Mail, User, Sparkles, Copy, Check, ChevronDown } from "lucide-react";
 
 interface Lead {
   id: string;
@@ -124,6 +132,34 @@ const LeadDetailsPage = () => {
     },
   });
 
+  const updateStatus = useMutation({
+    mutationFn: async (newStatus: string) => {
+      if (!id) throw new Error("Lead ID não encontrado");
+
+      const { error } = await supabase
+        .from("leads")
+        .update({ status: newStatus })
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lead", id] });
+      queryClient.invalidateQueries({ queryKey: ["leads"] });
+      toast({
+        title: "Status atualizado!",
+        description: "O status do lead foi alterado com sucesso.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao atualizar status",
+        description: error instanceof Error ? error.message : "Erro desconhecido",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleCopyMessage = () => {
     navigator.clipboard.writeText(generatedMessage);
     setCopied(true);
@@ -146,6 +182,17 @@ const LeadDetailsPage = () => {
     }
     addInteraction.mutate();
   };
+
+  const statusOptions = [
+    { value: "new", label: "Novo", color: "bg-gray-500/10 text-gray-600" },
+    { value: "contacted", label: "Contatado", color: "bg-blue-500/10 text-blue-600" },
+    { value: "qualified", label: "Qualificado", color: "bg-green-500/10 text-green-600" },
+    { value: "negotiation", label: "Negociação", color: "bg-yellow-500/10 text-yellow-600" },
+    { value: "won", label: "Ganho", color: "bg-emerald-500/10 text-emerald-600" },
+    { value: "lost", label: "Perdido", color: "bg-red-500/10 text-red-600" },
+  ];
+
+  const currentStatus = statusOptions.find((s) => s.value === lead.status) || statusOptions[0];
 
   if (loadingLead) {
     return (
@@ -217,20 +264,39 @@ const LeadDetailsPage = () => {
               </div>
             </div>
             <div className="text-right">
-              <div className="flex items-center gap-1">
+              <div className="mb-2 flex items-center justify-end gap-1">
                 <Star className="h-4 w-4 text-yellow-500" />
                 <span className="text-lg font-semibold">{lead.score ?? "—"}</span>
                 <span className="text-sm text-muted-foreground">/10</span>
               </div>
-              <span
-                className={`mt-1 inline-block rounded-full px-2 py-1 text-xs ${
-                  lead.status === "qualified"
-                    ? "bg-green-500/10 text-green-600"
-                    : "bg-gray-500/10 text-gray-600"
-                }`}
-              >
-                {lead.status === "qualified" ? "Qualificado" : lead.status}
-              </span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`${currentStatus.color}`}
+                  >
+                    {currentStatus.label}
+                    <ChevronDown className="ml-2 h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="z-50 bg-background" align="end">
+                  <DropdownMenuLabel>Alterar status</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {statusOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={option.value}
+                      onClick={() => updateStatus.mutate(option.value)}
+                      disabled={updateStatus.isPending}
+                      className="cursor-pointer"
+                    >
+                      <span className={`inline-block rounded-full px-2 py-1 text-xs ${option.color}`}>
+                        {option.label}
+                      </span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
