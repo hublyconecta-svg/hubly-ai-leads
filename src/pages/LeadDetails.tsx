@@ -80,7 +80,7 @@ const LeadDetailsPage = () => {
   );
   const [logoColors, setLogoColors] = useState("#0ea5e9, #0f172a");
   const [logoStyle, setLogoStyle] = useState("Minimalista, clean, focada em tipografia");
-  const [generatedLogos, setGeneratedLogos] = useState<string[]>([]);
+  const [generatedLogos, setGeneratedLogos] = useState<{ url: string; variant_index: number }[]>([]);
   const [isGeneratingLogos, setIsGeneratingLogos] = useState(false);
   const { data: lead, isLoading: loadingLead } = useQuery<Lead & { lead_sites?: LeadSite[] }>({
     queryKey: ["lead", id],
@@ -726,20 +726,43 @@ const LeadDetailsPage = () => {
                 <Button
                   type="button"
                   disabled={isGeneratingLogos}
-                  onClick={() => {
+                  onClick={async () => {
+                    if (!id) return;
                     setIsGeneratingLogos(true);
-                    setTimeout(() => {
-                      setGeneratedLogos(["variação 1", "variação 2", "variação 3"]);
-                      setIsGeneratingLogos(false);
-                      toast({
-                        title: "Em breve",
-                        description:
-                          "A geração automática de logos via IA será integrada aqui. Por enquanto, use esta aba para definir o briefing.",
+                    try {
+                      const { data, error } = await supabase.functions.invoke("generate-logo", {
+                        body: {
+                          lead_id: id,
+                          brief: logoBrief,
+                          colors: logoColors,
+                          style: logoStyle,
+                        },
                       });
-                    }, 800);
+
+                      if (error) throw error;
+
+                      const leadLogo = (data as any)?.lead_logo;
+                      const images = (leadLogo?.images || []) as { url: string; variant_index: number }[];
+                      setGeneratedLogos(images);
+
+                      toast({
+                        title: "Logos gerados!",
+                        description: "Novas variações de logo foram geradas para este lead.",
+                      });
+                    } catch (err) {
+                      console.error(err);
+                      toast({
+                        title: "Erro ao gerar logos",
+                        description:
+                          err instanceof Error ? err.message : "Tente novamente em alguns instantes.",
+                        variant: "destructive",
+                      });
+                    } finally {
+                      setIsGeneratingLogos(false);
+                    }
                   }}
                 >
-                  {isGeneratingLogos ? "Gerando..." : "Gerar logos (em breve via IA)"}
+                  {isGeneratingLogos ? "Gerando..." : "Gerar logos"}
                 </Button>
               </div>
 
@@ -770,7 +793,7 @@ const LeadDetailsPage = () => {
                           {lead.company_name.charAt(0).toUpperCase()}
                         </div>
                         <span>Variação de logo #{index + 1}</span>
-                        <span className="mt-1 truncate text-[11px] opacity-70">{logo}</span>
+                        <span className="mt-1 truncate text-[11px] opacity-70">{logo.url}</span>
                       </div>
                     ))}
                   </div>
