@@ -4,16 +4,9 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 export default defineConfig(({ mode }) => ({
-  server: {
-    host: "::",
-    hmr: {
-      overlay: false,
-    },
-  },
-
   preview: {
     host: "0.0.0.0",
-    allowedHosts: "all", // 👈 libera domínio do Easypanel
+    allowedHosts: "all",
   },
 
   plugins: [
