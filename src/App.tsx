@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/Auth";
 import { AuthProvider } from "@/integrations/supabase/AuthContext";
 import { RequireAuth } from "@/components/RequireAuth";
+import { AuthenticatedLayout } from "@/layouts/AuthenticatedLayout";
 import DashboardPage from "./pages/Dashboard";
 import CampaignsPage from "./pages/Campaigns";
 import NewCampaignPage from "./pages/CampaignsNew";
@@ -33,7 +34,9 @@ const App = () => (
               path="/dashboard"
               element={
                 <RequireAuth>
-                  <DashboardPage />
+                  <AuthenticatedLayout>
+                    <DashboardPage />
+                  </AuthenticatedLayout>
                 </RequireAuth>
               }
             />
@@ -41,7 +44,9 @@ const App = () => (
               path="/campanhas"
               element={
                 <RequireAuth>
-                  <CampaignsPage />
+                  <AuthenticatedLayout>
+                    <CampaignsPage />
+                  </AuthenticatedLayout>
                 </RequireAuth>
               }
             />
@@ -49,7 +54,9 @@ const App = () => (
               path="/campanhas/nova"
               element={
                 <RequireAuth>
-                  <NewCampaignPage />
+                  <AuthenticatedLayout>
+                    <NewCampaignPage />
+                  </AuthenticatedLayout>
                 </RequireAuth>
               }
             />
@@ -57,7 +64,9 @@ const App = () => (
               path="/leads"
               element={
                 <RequireAuth>
-                  <LeadsPage />
+                  <AuthenticatedLayout>
+                    <LeadsPage />
+                  </AuthenticatedLayout>
                 </RequireAuth>
               }
             />
@@ -65,7 +74,9 @@ const App = () => (
               path="/leads/:id"
               element={
                 <RequireAuth>
-                  <LeadDetailsPage />
+                  <AuthenticatedLayout>
+                    <LeadDetailsPage />
+                  </AuthenticatedLayout>
                 </RequireAuth>
               }
             />
@@ -73,7 +84,9 @@ const App = () => (
               path="/settings"
               element={
                 <RequireAuth>
-                  <SettingsPage />
+                  <AuthenticatedLayout>
+                    <SettingsPage />
+                  </AuthenticatedLayout>
                 </RequireAuth>
               }
             />
@@ -81,7 +94,9 @@ const App = () => (
               path="/upgrade"
               element={
                 <RequireAuth>
-                  <UpgradePage />
+                  <AuthenticatedLayout>
+                    <UpgradePage />
+                  </AuthenticatedLayout>
                 </RequireAuth>
               }
             />
