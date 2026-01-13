@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
-import { ArrowLeft, Building2, Globe, Star, Calendar, MessageSquare, Phone, Mail, User } from "lucide-react";
+import { ArrowLeft, Building2, Globe, Star, Calendar, MessageSquare, Phone, Mail, User, Sparkles, Copy, Check } from "lucide-react";
 
 interface Lead {
   id: string;
@@ -33,6 +33,8 @@ const LeadDetailsPage = () => {
   const queryClient = useQueryClient();
   const [newNote, setNewNote] = useState("");
   const [interactionType, setInteractionType] = useState<"note" | "email" | "call" | "meeting">("note");
+  const [generatedMessage, setGeneratedMessage] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const { data: lead, isLoading: loadingLead } = useQuery<Lead>({
     queryKey: ["lead", id],
@@ -91,6 +93,46 @@ const LeadDetailsPage = () => {
       });
     },
   });
+
+  const generateMessage = useMutation({
+    mutationFn: async () => {
+      if (!id) throw new Error("Lead ID não encontrado");
+
+      const { data, error } = await supabase.functions.invoke("generate-message", {
+        body: { lead_id: id },
+      });
+
+      if (error) throw error;
+      if (!data?.message) throw new Error("Mensagem não gerada");
+
+      return data.message;
+    },
+    onSuccess: (message) => {
+      setGeneratedMessage(message);
+      queryClient.invalidateQueries({ queryKey: ["lead-interactions", id] });
+      toast({
+        title: "Mensagem gerada!",
+        description: "A IA criou uma mensagem personalizada para este lead.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao gerar mensagem",
+        description: error instanceof Error ? error.message : "Erro desconhecido",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleCopyMessage = () => {
+    navigator.clipboard.writeText(generatedMessage);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    toast({
+      title: "Copiado!",
+      description: "Mensagem copiada para a área de transferência.",
+    });
+  };
 
   const handleSubmitNote = (e: React.FormEvent) => {
     e.preventDefault();
@@ -207,6 +249,55 @@ const LeadDetailsPage = () => {
             <Calendar className="h-3 w-3" />
             Criado em {new Date(lead.created_at).toLocaleString("pt-BR")}
           </div>
+        </div>
+
+        {/* Gerador de mensagens com IA */}
+        <div className="rounded-xl border border-border bg-card p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h2 className="flex items-center gap-2 text-lg font-semibold">
+                <Sparkles className="h-5 w-5 text-primary" />
+                Mensagem de vendas gerada por IA
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Use Lovable AI para criar uma abordagem personalizada
+              </p>
+            </div>
+            <Button
+              onClick={() => generateMessage.mutate()}
+              disabled={generateMessage.isPending}
+              size="sm"
+            >
+              {generateMessage.isPending ? "Gerando..." : "Gerar mensagem"}
+            </Button>
+          </div>
+
+          {generatedMessage && (
+            <div className="space-y-3">
+              <div className="rounded-lg border border-border/60 bg-muted/30 p-4">
+                <p className="whitespace-pre-wrap text-sm">{generatedMessage}</p>
+              </div>
+              <Button variant="outline" size="sm" onClick={handleCopyMessage}>
+                {copied ? (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Copiado!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copiar mensagem
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+
+          {generateMessage.isError && (
+            <p className="text-sm text-destructive">
+              Erro ao gerar mensagem. Tente novamente.
+            </p>
+          )}
         </div>
 
         {/* Adicionar nova interação */}
