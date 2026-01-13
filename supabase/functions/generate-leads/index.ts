@@ -171,6 +171,7 @@ Query original: ${query}`,
           website: result.link,
           score: Math.min(10, Math.max(0, analysis.score)),
           status: analysis.score >= 7 ? "qualified" : "new",
+          reasoning: analysis.reasoning || "Análise automática",
         });
       } catch (error) {
         console.error(`Erro ao processar ${result.link}:`, error);

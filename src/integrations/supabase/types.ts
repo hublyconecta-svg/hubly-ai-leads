@@ -44,12 +44,48 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_interactions: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          lead_id: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          lead_id: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          lead_id?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_interactions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           campaign_id: string
           company_name: string
           created_at: string
           id: string
+          reasoning: string | null
           score: number | null
           status: string
           updated_at: string
@@ -61,6 +97,7 @@ export type Database = {
           company_name: string
           created_at?: string
           id?: string
+          reasoning?: string | null
           score?: number | null
           status?: string
           updated_at?: string
@@ -72,6 +109,7 @@ export type Database = {
           company_name?: string
           created_at?: string
           id?: string
+          reasoning?: string | null
           score?: number | null
           status?: string
           updated_at?: string
