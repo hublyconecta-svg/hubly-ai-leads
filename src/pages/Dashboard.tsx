@@ -196,53 +196,75 @@ const DashboardPage = () => {
 
         {/* Funil de vendas */}
         {totalActive > 0 && (
-          <section className="rounded-xl border border-border bg-card p-6">
-            <h2 className="mb-4 text-lg font-semibold">Funil de vendas</h2>
-            <div className="space-y-3">
+          <section className="glass-card mt-4 animate-fade-in">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold tracking-tight text-foreground">Funil de vendas</h2>
+                <p className="text-xs text-muted-foreground/80">Distribuição dos leads por estágio ativo</p>
+              </div>
+              <span className="inline-flex items-center rounded-full border border-primary/50 bg-primary/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-primary shadow-[0_0_18px_rgba(192,132,252,0.65)]">
+                Ativos {totalActive}
+              </span>
+            </div>
+
+            <div className="space-y-4">
               {funnelStages.map((stage, index) => {
                 const percentage = totalActive > 0 ? (stage.count / totalActive) * 100 : 0;
+                const width = Math.max(percentage, 5);
                 return (
-                  <div key={stage.label}>
-                    <div className="mb-1 flex items-center justify-between text-sm">
-                      <span className="font-medium">{stage.label}</span>
-                      <span className="text-muted-foreground">
-                        {stage.count} ({percentage.toFixed(0)}%)
+                  <div key={stage.label} className="group">
+                    <div className="mb-1 flex items-center justify-between text-xs sm:text-sm">
+                      <span className="font-medium text-foreground/90">{stage.label}</span>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-background/40 px-2 py-0.5 text-[11px] text-muted-foreground shadow-[0_0_14px_rgba(15,23,42,0.9)]">
+                        <span className="font-mono text-[11px] text-primary">{stage.count}</span>
+                        <span className="text-[10px] text-muted-foreground/80">{percentage.toFixed(0)}%</span>
                       </span>
                     </div>
-                    <div className="h-8 overflow-hidden rounded-lg bg-muted">
+                    <div className="h-8 overflow-hidden rounded-xl bg-muted/40">
                       <div
-                        className={`h-full ${stage.color} flex items-center justify-center text-xs font-medium text-white transition-all duration-500`}
-                        style={{ width: `${Math.max(percentage, 5)}%` }}
+                        className="flex h-full items-center justify-end rounded-xl bg-gradient-to-r from-primary via-fuchsia-500 to-cyan-400 text-[11px] font-semibold text-primary-foreground shadow-[0_0_30px_rgba(192,132,252,0.65)] transition-all duration-500 group-hover:shadow-[0_0_40px_rgba(192,132,252,0.8)]"
+                        style={{ width: `${width}%` }}
                       >
-                        {stage.count > 0 && stage.count}
+                        {stage.count > 0 && (
+                          <span className="mr-3 font-mono">
+                            {stage.count}
+                            <span className="ml-1 text-[10px] opacity-70">leads</span>
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
                 );
               })}
             </div>
-            <div className="mt-4 rounded-lg bg-muted/30 p-3 text-sm">
-              <p className="text-muted-foreground">
-                <span className="font-semibold text-red-600">{leadsByStatus.lost} leads perdidos</span> não são
-                contabilizados no funil
+
+            <div className="mt-5 flex items-center justify-between rounded-xl border border-destructive/50 bg-destructive/5 px-3 py-2 text-xs text-muted-foreground/90">
+              <p>
+                <span className="font-semibold text-destructive">{leadsByStatus.lost} leads perdidos</span> não são
+                contabilizados no funil.
               </p>
+              <span className="hidden rounded-full border border-destructive/50 bg-destructive/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-destructive shadow-[0_0_18px_rgba(248,113,113,0.5)] sm:inline-flex">
+                Risco
+              </span>
             </div>
           </section>
         )}
 
         {/* Gráfico de evolução de leads ao longo do tempo */}
         {leadsTimeline.length > 0 && (
-          <section className="rounded-xl border border-border bg-card p-6">
-            <h2 className="mb-4 text-lg font-semibold">Evolução de leads ({periodLabel})</h2>
+          <section className="glass-card animate-fade-in [animation-delay:180ms] mt-6">
+            <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground">
+              Evolução de leads <span className="text-sm text-muted-foreground">({periodLabel})</span>
+            </h2>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={leadsTimeline.slice(-periodDays)}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis 
-                  dataKey="date" 
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted/60" />
+                <XAxis
+                  dataKey="date"
                   className="text-xs text-muted-foreground"
                   tick={{ fill: "hsl(var(--muted-foreground))" }}
                 />
-                <YAxis 
+                <YAxis
                   className="text-xs text-muted-foreground"
                   tick={{ fill: "hsl(var(--muted-foreground))" }}
                 />
@@ -250,7 +272,8 @@ const DashboardPage = () => {
                   contentStyle={{
                     backgroundColor: "hsl(var(--card))",
                     border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px",
+                    borderRadius: "12px",
+                    boxShadow: "0 20px 50px rgba(15,23,42,0.7)",
                   }}
                 />
                 <Legend />
@@ -261,6 +284,7 @@ const DashboardPage = () => {
                   stroke="hsl(var(--primary))"
                   strokeWidth={2}
                   dot={{ fill: "hsl(var(--primary))" }}
+                  activeDot={{ r: 6, stroke: "hsl(var(--secondary))", strokeWidth: 2 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -269,17 +293,17 @@ const DashboardPage = () => {
 
         {/* Gráfico de taxa de conversão por campanha */}
         {campaignStats.length > 0 && (
-          <section className="rounded-xl border border-border bg-card p-6">
-            <h2 className="mb-4 text-lg font-semibold">Performance por campanha</h2>
+          <section className="glass-card animate-fade-in [animation-delay:220ms] mt-6">
+            <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground">Performance por campanha</h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={campaignStats}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis 
-                  dataKey="name" 
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted/60" />
+                <XAxis
+                  dataKey="name"
                   className="text-xs text-muted-foreground"
                   tick={{ fill: "hsl(var(--muted-foreground))" }}
                 />
-                <YAxis 
+                <YAxis
                   className="text-xs text-muted-foreground"
                   tick={{ fill: "hsl(var(--muted-foreground))" }}
                 />
@@ -287,20 +311,21 @@ const DashboardPage = () => {
                   contentStyle={{
                     backgroundColor: "hsl(var(--card))",
                     border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px",
+                    borderRadius: "12px",
+                    boxShadow: "0 20px 50px rgba(15,23,42,0.7)",
                   }}
                 />
                 <Legend />
-                <Bar dataKey="leads" name="Total de leads" fill="hsl(var(--primary))" />
-                <Bar dataKey="qualified" name="Qualificados" fill="hsl(142.1 76.2% 36.3%)" />
-                <Bar dataKey="won" name="Ganhos" fill="hsl(142.1 70.6% 45.3%)" />
+                <Bar dataKey="leads" name="Total de leads" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="qualified" name="Qualificados" fill="hsl(var(--chart-4))" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="won" name="Ganhos" fill="hsl(var(--chart-5))" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-            
+
             {/* Tabela de taxas de conversão */}
-            <div className="mt-6 overflow-hidden rounded-lg border border-border">
+            <div className="mt-6 overflow-hidden rounded-xl border border-border/80 bg-background/40">
               <table className="w-full text-sm">
-                <thead className="bg-muted/60 text-xs text-muted-foreground">
+                <thead className="bg-muted/40 text-xs text-muted-foreground">
                   <tr>
                     <th className="px-4 py-2 text-left font-medium">Campanha</th>
                     <th className="px-4 py-2 text-center font-medium">Leads</th>
@@ -310,14 +335,18 @@ const DashboardPage = () => {
                 </thead>
                 <tbody>
                   {campaignStats.map((stat, i) => (
-                    <tr key={i} className="border-t border-border/60">
+                    <tr key={i} className="border-t border-border/70">
                       <td className="px-4 py-2">{stat.name}</td>
-                      <td className="px-4 py-2 text-center">{stat.leads}</td>
-                      <td className="px-4 py-2 text-center font-medium text-green-600">
-                        {stat.qualificationRate}%
+                      <td className="px-4 py-2 text-center font-mono text-xs">{stat.leads}</td>
+                      <td className="px-4 py-2 text-center">
+                        <span className="inline-flex rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-400 shadow-[0_0_18px_rgba(34,197,94,0.45)]">
+                          {stat.qualificationRate}%
+                        </span>
                       </td>
-                      <td className="px-4 py-2 text-center font-medium text-primary">
-                        {stat.conversionRate}%
+                      <td className="px-4 py-2 text-center">
+                        <span className="inline-flex rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-semibold text-primary shadow-[0_0_18px_rgba(192,132,252,0.5)]">
+                          {stat.conversionRate}%
+                        </span>
                       </td>
                     </tr>
                   ))}
@@ -329,17 +358,19 @@ const DashboardPage = () => {
 
         {/* Gráfico de distribuição de status ao longo do tempo */}
         {statusTimeline.length > 0 && (
-          <section className="rounded-xl border border-border bg-card p-6">
-            <h2 className="mb-4 text-lg font-semibold">Distribuição de status ao longo do tempo</h2>
+          <section className="glass-card animate-fade-in [animation-delay:260ms] mt-6">
+            <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground">
+              Distribuição de status ao longo do tempo
+            </h2>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={statusTimeline.slice(-periodDays)}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis 
-                  dataKey="date" 
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted/60" />
+                <XAxis
+                  dataKey="date"
                   className="text-xs text-muted-foreground"
                   tick={{ fill: "hsl(var(--muted-foreground))" }}
                 />
-                <YAxis 
+                <YAxis
                   className="text-xs text-muted-foreground"
                   tick={{ fill: "hsl(var(--muted-foreground))" }}
                 />
@@ -347,7 +378,8 @@ const DashboardPage = () => {
                   contentStyle={{
                     backgroundColor: "hsl(var(--card))",
                     border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px",
+                    borderRadius: "12px",
+                    boxShadow: "0 20px 50px rgba(15,23,42,0.7)",
                   }}
                 />
                 <Legend />
