@@ -12,6 +12,7 @@ import DashboardPage from "./pages/Dashboard";
 import CampaignsPage from "./pages/Campaigns";
 import NewCampaignPage from "./pages/CampaignsNew";
 import LeadsPage from "./pages/Leads";
+import LeadDetailsPage from "./pages/LeadDetails";
 import SettingsPage from "./pages/Settings";
 import UpgradePage from "./pages/Upgrade";
 
@@ -57,6 +58,14 @@ const App = () => (
               element={
                 <RequireAuth>
                   <LeadsPage />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/leads/:id"
+              element={
+                <RequireAuth>
+                  <LeadDetailsPage />
                 </RequireAuth>
               }
             />
