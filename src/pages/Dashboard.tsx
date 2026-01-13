@@ -170,7 +170,7 @@ const DashboardPage = () => {
           </div>
         </header>
 
-        <main className="grid gap-5 md:grid-cols-3">
+        <main className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           <div className="glass-card animate-fade-in">
             <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground/70">Leads gerados</p>
             <p className="mt-3 font-mono text-3xl font-semibold text-primary">
@@ -186,11 +186,6 @@ const DashboardPage = () => {
               {loadingCampaigns ? "..." : activeCampaigns}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">Campanhas com leads em andamento</p>
-          </div>
-          <div className="glass-card animate-fade-in [animation-delay:120ms]">
-            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground/70">Créditos</p>
-            <p className="mt-3 font-mono text-3xl font-semibold text-accent">50</p>
-            <p className="mt-1 text-xs text-muted-foreground">Plano Free (mock)</p>
           </div>
         </main>
 
