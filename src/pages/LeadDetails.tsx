@@ -490,9 +490,6 @@ const LeadDetailsPage = () => {
                     <Sparkles className="h-5 w-5 text-primary" />
                     Mensagens de vendas geradas por IA
                   </h2>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Gere 3 variações de mensagem personalizada com Lovable AI
-                  </p>
                 </div>
                 <Button
                   onClick={handleOpenMessageModal}
