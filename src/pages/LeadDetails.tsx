@@ -110,6 +110,22 @@ const LeadDetailsPage = () => {
     enabled: !!user && !!id,
   });
 
+  const { data: lastLogos } = useQuery<{ images: { url: string; variant_index: number }[] } | null>({
+    queryKey: ["lead-logos", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("lead_logos")
+        .select("images")
+        .eq("lead_id", id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data as { images: { url: string; variant_index: number }[] } | null;
+    },
+    enabled: !!user && !!id,
+  });
+
   const addInteraction = useMutation({
     mutationFn: async () => {
       if (!user?.id || !id) throw new Error("Usuário não autenticado");
@@ -248,6 +264,12 @@ const LeadDetailsPage = () => {
       }
     }
   }, [lead, siteHtml, siteCss]);
+
+  useEffect(() => {
+    if (lastLogos?.images && lastLogos.images.length > 0 && generatedLogos.length === 0) {
+      setGeneratedLogos(lastLogos.images);
+    }
+  }, [lastLogos, generatedLogos.length]);
 
   const handleCopyMessage = () => {
     navigator.clipboard.writeText(generatedMessage);
