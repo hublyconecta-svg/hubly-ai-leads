@@ -2,9 +2,23 @@ import { useAuth } from "@/integrations/supabase/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 const DashboardPage = () => {
   const { user } = useAuth();
+  const [period, setPeriod] = useState<"7d" | "30d" | "90d">("30d");
 
   const { data: campaigns, isLoading: loadingCampaigns } = useQuery({
     queryKey: ["campaigns"],
@@ -55,24 +69,98 @@ const DashboardPage = () => {
 
   const totalActive = leadsByStatus.new + leadsByStatus.contacted + leadsByStatus.qualified + leadsByStatus.negotiation;
 
+  // Preparar dados para gráfico de evolução temporal
+  const leadsTimeline = leads?.reduce((acc, lead) => {
+    const date = new Date(lead.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+    const existing = acc.find((item) => item.date === date);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      acc.push({ date, count: 1 });
+    }
+    return acc;
+  }, [] as { date: string; count: number }[]) || [];
+
+  // Agrupar leads por campanha e calcular taxa de conversão
+  const campaignStats = campaigns?.map((campaign) => {
+    const campaignLeads = leads?.filter((l) => l.campaign_id === campaign.id) || [];
+    const total = campaignLeads.length;
+    const won = campaignLeads.filter((l) => l.status === "won").length;
+    const qualified = campaignLeads.filter((l) => l.status === "qualified").length;
+    const conversionRate = total > 0 ? ((won / total) * 100).toFixed(1) : "0";
+    const qualificationRate = total > 0 ? ((qualified / total) * 100).toFixed(1) : "0";
+
+    return {
+      name: campaign.name.length > 20 ? campaign.name.substring(0, 20) + "..." : campaign.name,
+      leads: total,
+      won,
+      qualified,
+      conversionRate: parseFloat(conversionRate),
+      qualificationRate: parseFloat(qualificationRate),
+    };
+  }).filter((c) => c.leads > 0) || [];
+
+  // Preparar dados de comparação por status ao longo do tempo
+  const statusTimeline = leads?.reduce((acc, lead) => {
+    const date = new Date(lead.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+    const existing = acc.find((item) => item.date === date);
+    
+    if (existing) {
+      existing[lead.status] = (existing[lead.status] || 0) + 1;
+    } else {
+      acc.push({ 
+        date, 
+        [lead.status]: 1,
+        new: 0,
+        contacted: 0,
+        qualified: 0,
+        negotiation: 0,
+        won: 0,
+        lost: 0,
+      });
+    }
+    return acc;
+  }, [] as any[]) || [];
+
+  const periodDays = period === "7d" ? 7 : period === "30d" ? 30 : 90;
+  const periodLabel = period === "7d" ? "7 dias" : period === "30d" ? "30 dias" : "90 dias";
+
   return (
     <div className="min-h-screen bg-background px-4 py-8">
       <div className="mx-auto max-w-5xl space-y-6">
-        <header className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-medium tracking-[0.2em] text-muted-foreground">HUBLY</p>
-            <h1 className="text-2xl font-semibold">Dashboard</h1>
-            <p className="text-sm text-muted-foreground">
-              Bem-vindo{user?.email ? `, ${user.email}` : ""}. Aqui você verá o resumo das suas campanhas e leads.
-            </p>
+        <header className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium tracking-[0.2em] text-muted-foreground">HUBLY</p>
+              <h1 className="text-2xl font-semibold">Dashboard</h1>
+              <p className="text-sm text-muted-foreground">
+                Bem-vindo{user?.email ? `, ${user.email}` : ""}. Aqui você verá o resumo das suas campanhas e leads.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button asChild size="sm">
+                <a href="/campanhas/nova">Nova campanha</a>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <a href="/leads">Ver leads</a>
+              </Button>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button asChild size="sm">
-              <a href="/campanhas/nova">Nova campanha</a>
-            </Button>
-            <Button variant="outline" size="sm" asChild>
-              <a href="/leads">Ver leads</a>
-            </Button>
+
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Período:</span>
+            <div className="flex gap-1">
+              {(["7d", "30d", "90d"] as const).map((p) => (
+                <Button
+                  key={p}
+                  variant={period === p ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setPeriod(p)}
+                >
+                  {p === "7d" ? "7 dias" : p === "30d" ? "30 dias" : "90 dias"}
+                </Button>
+              ))}
+            </div>
           </div>
         </header>
 
@@ -132,6 +220,137 @@ const DashboardPage = () => {
                 contabilizados no funil
               </p>
             </div>
+          </section>
+        )}
+
+        {/* Gráfico de evolução de leads ao longo do tempo */}
+        {leadsTimeline.length > 0 && (
+          <section className="rounded-xl border border-border bg-card p-6">
+            <h2 className="mb-4 text-lg font-semibold">Evolução de leads ({periodLabel})</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={leadsTimeline.slice(-periodDays)}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis 
+                  dataKey="date" 
+                  className="text-xs text-muted-foreground"
+                  tick={{ fill: "hsl(var(--muted-foreground))" }}
+                />
+                <YAxis 
+                  className="text-xs text-muted-foreground"
+                  tick={{ fill: "hsl(var(--muted-foreground))" }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "8px",
+                  }}
+                />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="count"
+                  name="Leads gerados"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  dot={{ fill: "hsl(var(--primary))" }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </section>
+        )}
+
+        {/* Gráfico de taxa de conversão por campanha */}
+        {campaignStats.length > 0 && (
+          <section className="rounded-xl border border-border bg-card p-6">
+            <h2 className="mb-4 text-lg font-semibold">Performance por campanha</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={campaignStats}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis 
+                  dataKey="name" 
+                  className="text-xs text-muted-foreground"
+                  tick={{ fill: "hsl(var(--muted-foreground))" }}
+                />
+                <YAxis 
+                  className="text-xs text-muted-foreground"
+                  tick={{ fill: "hsl(var(--muted-foreground))" }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "8px",
+                  }}
+                />
+                <Legend />
+                <Bar dataKey="leads" name="Total de leads" fill="hsl(var(--primary))" />
+                <Bar dataKey="qualified" name="Qualificados" fill="hsl(142.1 76.2% 36.3%)" />
+                <Bar dataKey="won" name="Ganhos" fill="hsl(142.1 70.6% 45.3%)" />
+              </BarChart>
+            </ResponsiveContainer>
+            
+            {/* Tabela de taxas de conversão */}
+            <div className="mt-6 overflow-hidden rounded-lg border border-border">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/60 text-xs text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-2 text-left font-medium">Campanha</th>
+                    <th className="px-4 py-2 text-center font-medium">Leads</th>
+                    <th className="px-4 py-2 text-center font-medium">Taxa Qualif.</th>
+                    <th className="px-4 py-2 text-center font-medium">Taxa Conversão</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {campaignStats.map((stat, i) => (
+                    <tr key={i} className="border-t border-border/60">
+                      <td className="px-4 py-2">{stat.name}</td>
+                      <td className="px-4 py-2 text-center">{stat.leads}</td>
+                      <td className="px-4 py-2 text-center font-medium text-green-600">
+                        {stat.qualificationRate}%
+                      </td>
+                      <td className="px-4 py-2 text-center font-medium text-primary">
+                        {stat.conversionRate}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
+        {/* Gráfico de distribuição de status ao longo do tempo */}
+        {statusTimeline.length > 0 && (
+          <section className="rounded-xl border border-border bg-card p-6">
+            <h2 className="mb-4 text-lg font-semibold">Distribuição de status ao longo do tempo</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={statusTimeline.slice(-periodDays)}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis 
+                  dataKey="date" 
+                  className="text-xs text-muted-foreground"
+                  tick={{ fill: "hsl(var(--muted-foreground))" }}
+                />
+                <YAxis 
+                  className="text-xs text-muted-foreground"
+                  tick={{ fill: "hsl(var(--muted-foreground))" }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "8px",
+                  }}
+                />
+                <Legend />
+                <Line type="monotone" dataKey="new" name="Novos" stroke="#9ca3af" strokeWidth={2} />
+                <Line type="monotone" dataKey="contacted" name="Contatados" stroke="#3b82f6" strokeWidth={2} />
+                <Line type="monotone" dataKey="qualified" name="Qualificados" stroke="#22c55e" strokeWidth={2} />
+                <Line type="monotone" dataKey="negotiation" name="Negociação" stroke="#eab308" strokeWidth={2} />
+                <Line type="monotone" dataKey="won" name="Ganhos" stroke="#10b981" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
           </section>
         )}
       </div>
