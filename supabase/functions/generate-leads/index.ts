@@ -115,15 +115,25 @@ serve(async (req) => {
             messages: [
               {
                 role: "system",
-                content: `Você é um especialista em qualificação de leads B2B. Analise o resultado de busca e atribua um score de 0 a 10 baseado em:
-- Relevância do negócio para a busca
-- Clareza das informações
-- Potencial como lead de vendas
-Retorne APENAS um JSON válido no formato: {"score": número, "company_name": "nome", "reasoning": "breve explicação"}`,
+                content: `Você é um especialista em qualificar leads para venda de websites e presença digital.
+
+OBJETIVO: Identificar empresas que são OPORTUNIDADES DE VENDA - aquelas que precisam de um website novo ou melhor.
+
+Avalie o resultado e atribua um score de 0 a 10 baseado em:
+- Presença digital fraca ou ausente (score ALTO)
+- Site desatualizado, básico ou apenas redes sociais (score ALTO)  
+- Apenas páginas em diretórios/marketplaces sem site próprio (score ALTO)
+- Negócio com potencial mas sem presença online adequada (score ALTO)
+- Sites modernos e bem feitos (score BAIXO - não é oportunidade)
+
+IMPORTANTE: Se o resultado mostrar um website corporativo moderno e completo, retorne score 0 e explique que já tem site adequado.
+
+Retorne APENAS um JSON válido no formato:
+{"score": número, "company_name": "nome", "reasoning": "explicação sobre a oportunidade de venda de website"}`,
               },
               {
                 role: "user",
-                content: `Qualifique este resultado:
+                content: `Qualifique este resultado como oportunidade de venda de website:
 Título: ${result.title}
 URL: ${result.link}
 Descrição: ${result.snippet || "Sem descrição"}
@@ -164,15 +174,18 @@ Query original: ${query}`,
           }
         }
 
-        leadsToInsert.push({
-          user_id,
-          campaign_id,
-          company_name: analysis.company_name || result.title,
-          website: result.link,
-          score: Math.min(10, Math.max(0, analysis.score)),
-          status: analysis.score >= 7 ? "qualified" : "new",
-          reasoning: analysis.reasoning || "Análise automática",
-        });
+        // Filtrar apenas oportunidades reais (score >= 5)
+        if (analysis.score >= 5) {
+          leadsToInsert.push({
+            user_id,
+            campaign_id,
+            company_name: analysis.company_name || result.title,
+            website: result.link,
+            score: Math.min(10, Math.max(0, analysis.score)),
+            status: analysis.score >= 7 ? "qualified" : "new",
+            reasoning: analysis.reasoning || "Oportunidade de venda de website",
+          });
+        }
       } catch (error) {
         console.error(`Erro ao processar ${result.link}:`, error);
         continue;
