@@ -14,14 +14,8 @@ const Index = () => {
             </span>
           </div>
           <div className="flex items-center gap-3 text-sm">
-            <Button variant="ghost" className="text-muted-foreground" asChild>
-              <a href="#precos">Preços</a>
-            </Button>
             <Button variant="ghost" size="sm" className="text-muted-foreground" asChild>
               <a href="/auth">Entrar</a>
-            </Button>
-            <Button size="sm" className="shadow-sm" asChild>
-              <a href="/auth?mode=signup">Começar grátis</a>
             </Button>
           </div>
         </div>
@@ -44,15 +38,9 @@ const Index = () => {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <Button size="lg" className="px-6" asChild>
-                <a href="/auth?mode=signup">Começar grátis</a>
-              </Button>
               <Button variant="outline" size="lg" className="border-border px-6" asChild>
                 <a href="#como-funciona">Ver como funciona</a>
               </Button>
-              <p className="w-full text-xs text-muted-foreground sm:w-auto">
-                Sem cartão de crédito · Focado em empresas brasileiras
-              </p>
             </div>
             <div className="grid gap-4 text-xs text-muted-foreground sm:grid-cols-3 sm:text-sm">
               <div>
@@ -167,76 +155,6 @@ const Index = () => {
           </div>
         </section>
 
-        <section id="precos" className="space-y-8">
-          <div className="space-y-2 text-center">
-            <h2 className="text-2xl font-semibold tracking-tight">Comece grátis, evolua quando fizer sentido</h2>
-            <p className="text-sm text-muted-foreground">
-              Um modelo simples para você validar o canal antes de investir pesado.
-            </p>
-          </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-5">
-              <div className="space-y-3">
-                <p className="text-xs font-semibold text-muted-foreground">Free</p>
-                <p className="text-lg font-semibold">Para testar o canal</p>
-                <p className="text-sm text-muted-foreground">Ideal para validar se a prospecção com IA faz sentido.</p>
-                <p className="mt-2 text-2xl font-semibold">R$ 0</p>
-                <p className="text-xs text-muted-foreground">até 50 leads/mês</p>
-                <ul className="mt-3 space-y-1 text-xs text-muted-foreground">
-                  <li>· 3 buscas de IA por mês</li>
-                  <li>· Qualificação básica de leads</li>
-                  <li>· Exportação manual</li>
-                </ul>
-              </div>
-              <Button className="mt-6 w-full" variant="outline" asChild>
-                <a href="/auth?mode=signup">Começar grátis</a>
-              </Button>
-            </div>
-
-            <div className="relative flex flex-col justify-between rounded-2xl border border-primary bg-card p-5 shadow-sm">
-              <div className="absolute right-4 top-4 rounded-full bg-primary px-2 py-0.5 text-[10px] font-medium text-primary-foreground">
-                Mais popular
-              </div>
-              <div className="space-y-3">
-                <p className="text-xs font-semibold text-primary">Pro</p>
-                <p className="text-lg font-semibold">Para times comerciais</p>
-                <p className="text-sm text-muted-foreground">
-                  Para SDRs e closers que querem canal previsível de reuniões qualificadas.
-                </p>
-                <p className="mt-2 text-2xl font-semibold">R$ 99/mês</p>
-                <p className="text-xs text-muted-foreground">até 500 leads/mês</p>
-                <ul className="mt-3 space-y-1 text-xs text-muted-foreground">
-                  <li>· Buscas diárias ilimitadas (uso justo)</li>
-                  <li>· Score de fit avançado</li>
-                  <li>· Mensagens personalizadas salvas por lead</li>
-                </ul>
-              </div>
-              <Button className="mt-6 w-full" asChild>
-                <a href="/upgrade">Quero o plano Pro</a>
-              </Button>
-            </div>
-
-            <div className="flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-5">
-              <div className="space-y-3">
-                <p className="text-xs font-semibold text-muted-foreground">Enterprise</p>
-                <p className="text-lg font-semibold">Para squads de growth</p>
-                <p className="text-sm text-muted-foreground">
-                  Quando você precisa de integrações profundas e governança.
-                </p>
-                <p className="mt-2 text-2xl font-semibold">Sob consulta</p>
-                <p className="text-xs text-muted-foreground">limites customizados</p>
-                <ul className="mt-3 space-y-1 text-xs text-muted-foreground">
-                  <li>· Integração com CRM</li>
-                  <li>· Workspaces e permissões</li>
-                  <li>· Suporte prioritário</li>
-                </ul>
-              </div>
-              <Button className="mt-6 w-full" variant="outline" asChild>
-                <a href="mailto:contato@hubly.app?subject=Plano%20Enterprise%20Hubly">Falar com vendas</a>
-              </Button>
-            </div>
-          </div>
-        </section>
       </main>
 
       <footer className="border-t border-border/60 bg-background/80">
