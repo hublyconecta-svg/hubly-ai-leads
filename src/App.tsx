@@ -16,6 +16,8 @@ import LeadsPage from "./pages/Leads";
 import LeadDetailsPage from "./pages/LeadDetails";
 import SettingsPage from "./pages/Settings";
 import UpgradePage from "./pages/Upgrade";
+import SuperAdminPage from "./pages/SuperAdmin";
+import { SuperAdminGuard } from "@/components/SuperAdminGuard";
 
 const queryClient = new QueryClient();
 
@@ -96,6 +98,18 @@ const App = () => (
                 <RequireAuth>
                   <AuthenticatedLayout>
                     <UpgradePage />
+                  </AuthenticatedLayout>
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <RequireAuth>
+                  <AuthenticatedLayout>
+                    <SuperAdminGuard>
+                      <SuperAdminPage />
+                    </SuperAdminGuard>
                   </AuthenticatedLayout>
                 </RequireAuth>
               }
