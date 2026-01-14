@@ -16,6 +16,7 @@ import LeadsPage from "./pages/Leads";
 import LeadDetailsPage from "./pages/LeadDetails";
 import SettingsPage from "./pages/Settings";
 import SuperAdminPage from "./pages/SuperAdmin";
+import PrdPromptPage from "./pages/PrdPrompt";
 import { SuperAdminGuard } from "@/components/SuperAdminGuard";
 
 const queryClient = new QueryClient();
@@ -92,18 +93,15 @@ const App = () => (
               }
             />
             <Route
-              path="/admin"
+              path="/prd-prompt"
               element={
                 <RequireAuth>
                   <AuthenticatedLayout>
-                    <SuperAdminGuard>
-                      <SuperAdminPage />
-                    </SuperAdminGuard>
+                    <PrdPromptPage />
                   </AuthenticatedLayout>
                 </RequireAuth>
               }
             />
-
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
