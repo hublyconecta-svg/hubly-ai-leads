@@ -118,6 +118,7 @@ const LeadsPage = () => {
             <table className="w-full text-sm">
               <thead className="bg-muted/60 text-xs text-muted-foreground">
                 <tr>
+                  <th className="w-16 px-4 py-2 text-left font-medium">Nº</th>
                   <th className="px-4 py-2 text-left font-medium">Empresa</th>
                   <th className="px-4 py-2 text-left font-medium">Site</th>
                   <th className="px-4 py-2 text-left font-medium">Score IA</th>
@@ -126,8 +127,9 @@ const LeadsPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredLeads.map((lead) => (
+                {filteredLeads.map((lead, index) => (
                   <tr key={lead.id} className="border-t border-border/60 hover:bg-muted/20">
+                    <td className="px-4 py-2 tabular-nums text-muted-foreground">{index + 1}</td>
                     <td className="px-4 py-2 font-medium">{lead.company_name}</td>
                     <td className="px-4 py-2">
                       {lead.website ? (
