@@ -82,6 +82,11 @@ const LeadsPage = () => {
     }
   };
 
+  const formatWhatsappLink = (value: string) => {
+    const digits = value.replace(/\D/g, "");
+    return digits ? `https://wa.me/${digits}` : null;
+  };
+
   return (
     <div className="min-h-screen bg-background px-4 py-8">
       <div className="mx-auto max-w-5xl space-y-4">
@@ -121,6 +126,7 @@ const LeadsPage = () => {
                   <th className="w-16 px-4 py-2 text-left font-medium">Nº</th>
                   <th className="px-4 py-2 text-left font-medium">Empresa</th>
                   <th className="px-4 py-2 text-left font-medium">Site</th>
+                  <th className="px-4 py-2 text-left font-medium">WhatsApp</th>
                   <th className="px-4 py-2 text-left font-medium">Score IA</th>
                   <th className="px-4 py-2 text-left font-medium">Status</th>
                   <th className="px-4 py-2 text-left font-medium">Ações</th>
@@ -141,6 +147,27 @@ const LeadsPage = () => {
                         >
                           {lead.website.replace("https://", "").replace("http://", "")}
                         </a>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2">
+                      {lead.whatsapp ? (
+                        (() => {
+                          const link = formatWhatsappLink(lead.whatsapp);
+                          return link ? (
+                            <a
+                              href={link}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-primary underline hover:no-underline"
+                            >
+                              {lead.whatsapp}
+                            </a>
+                          ) : (
+                            <span>{lead.whatsapp}</span>
+                          );
+                        })()
                       ) : (
                         <span className="text-muted-foreground">—</span>
                       )}
