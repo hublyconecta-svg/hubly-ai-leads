@@ -169,7 +169,7 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+          <div className="flex-wrap gap-3 text-sm text-muted-foreground flex items-center justify-start">
             <span className="text-xs font-medium uppercase tracking-[0.18em]">
               Período
             </span>
@@ -186,24 +186,24 @@ const DashboardPage = () => {
 
         <main className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           <div className="glass-card animate-fade-in">
-            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground/70">
-              Leads gerados
+            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground/70 mx-[5px] px-[5px]">
+                       Leads gerados
             </p>
-            <p className="mt-3 font-mono text-3xl font-semibold text-primary">
+            <p className="mt-3 font-mono text-3xl font-semibold text-primary mx-[5px]">
               {loadingLeads ? "..." : leadsCount}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-1 text-xs text-muted-foreground mx-[5px]">
               {leadsCount === 0 ? "Crie sua primeira campanha" : "Total de leads cadastrados"}
             </p>
           </div>
           <div className="glass-card animate-fade-in [animation-delay:60ms]">
-            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground/70">
+            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground/70 mx-[5px] px-[5px]">
               Campanhas ativas
             </p>
-            <p className="mt-3 font-mono text-3xl font-semibold text-secondary">
+            <p className="mt-3 font-mono text-3xl font-semibold text-secondary mx-[5px]">
               {loadingCampaigns ? "..." : activeCampaigns}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-1 text-xs text-muted-foreground mx-[5px]">
               Campanhas com leads em andamento
             </p>
           </div>
@@ -216,7 +216,7 @@ const DashboardPage = () => {
                 <h2 className="text-lg font-semibold tracking-tight text-foreground mx-[10px]">
                   Funil de vendas
                 </h2>
-                <p className="text-xs text-muted-foreground/80">
+                <p className="text-xs text-muted-foreground/80 mx-[5px] px-[5px]">
                   Distribuição dos leads por estágio ativo
                 </p>
               </div>
@@ -230,7 +230,7 @@ const DashboardPage = () => {
             const percentage = totalActive > 0 ? stage.count / totalActive * 100 : 0;
             const width = Math.max(percentage, 5);
             return <div key={stage.label} className="group">
-                    <div className="mb-1 flex items-center justify-between text-xs sm:text-sm">
+                    <div className="mb-1 text-xs sm:text-sm flex-row flex items-start justify-between">
                       <span className="font-medium text-foreground/90">
                         {stage.label}
                       </span>
@@ -244,7 +244,7 @@ const DashboardPage = () => {
                       </span>
                     </div>
                     <div className="h-8 overflow-hidden rounded-xl bg-muted/40">
-                      <div className="flex h-full items-center justify-end rounded-xl bg-gradient-to-r from-primary via-fuchsia-500 to-cyan-400 text-[11px] font-semibold text-primary-foreground shadow-[0_0_30px_rgba(192,132,252,0.65)] transition-all duration-500 group-hover:shadow-[0_0_40px_rgba(192,132,252,0.8)]" style={{
+                      <div className="h-full rounded-xl bg-gradient-to-r from-primary via-fuchsia-500 to-cyan-400 text-[11px] font-semibold text-primary-foreground shadow-[0_0_30px_rgba(192,132,252,0.65)] transition-all duration-500 group-hover:shadow-[0_0_40px_rgba(192,132,252,0.8)] flex-row flex items-center justify-center" style={{
                   width: `${width}%`
                 }}>
                         {stage.count > 0 && <span className="mr-3 font-mono">
@@ -274,7 +274,7 @@ const DashboardPage = () => {
         {(leadsTimeline.length > 0 || campaignStats.length > 0) && <section className="mt-6 grid gap-5 md:grid-cols-2">
             {/* Gráfico de evolução de leads ao longo do tempo */}
             {leadsTimeline.length > 0 && <div className="glass-card animate-fade-in [animation-delay:180ms] h-full">
-                <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground">
+                <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground px-[5px] mx-[5px]">
                   Evolução de leads
                   <span className="ml-1 text-sm text-muted-foreground">
                     ({periodLabel})
@@ -309,7 +309,7 @@ const DashboardPage = () => {
 
             {/* Gráfico de taxa de conversão por campanha */}
             {campaignStats.length > 0 && <div className="glass-card animate-fade-in [animation-delay:220ms] h-full">
-                <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground">
+                <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground mx-[5px] px-[5px]">
                   Performance por campanha
                 </h2>
                 <ResponsiveContainer width="100%" height={280}>
@@ -373,8 +373,8 @@ const DashboardPage = () => {
           </section>}
 
         {/* Gráfico de distribuição de status ao longo do tempo */}
-        {statusTimeline.length > 0 && <section className="glass-card animate-fade-in [animation-delay:260ms] mt-6">
-            <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground">
+        {statusTimeline.length > 0 && <section className="glass-card animate-fade-in [animation-delay:260ms] mt-6 mx-[5px] px-[5px]">
+            <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground mx-[5px] px-[5px]">
               Distribuição de status ao longo do tempo
             </h2>
             <ResponsiveContainer width="100%" height={300}>
