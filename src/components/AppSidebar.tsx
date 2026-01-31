@@ -11,13 +11,15 @@ import {
 } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
-import { LayoutDashboard, Megaphone, Users, Settings, Shield, FileText } from "lucide-react";
+import { LayoutDashboard, Megaphone, Users, Settings, Shield, FileText, Globe, Image } from "lucide-react";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 
 const items = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Campanhas", url: "/campanhas", icon: Megaphone },
   { title: "Leads", url: "/leads", icon: Users },
+  { title: "Motor Próprio", url: "/motor-proprio", icon: Globe },
+  { title: "Gerador de Logos", url: "/gerador-logos", icon: Image },
   { title: "PRD Prompt", url: "/prd-prompt", icon: FileText },
   { title: "Configurações", url: "/settings", icon: Settings },
 ];

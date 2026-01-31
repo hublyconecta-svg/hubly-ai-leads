@@ -18,6 +18,8 @@ import SettingsPage from "./pages/Settings";
 import SuperAdminPage from "./pages/SuperAdmin";
 import PrdPromptPage from "./pages/PrdPrompt";
 import { SuperAdminGuard } from "@/components/SuperAdminGuard";
+import MotorProprioPage from "./pages/MotorProprio";
+import GeradorLogosPage from "./pages/GeradorLogos";
 
 const queryClient = new QueryClient();
 
@@ -98,6 +100,28 @@ const App = () => (
                 <RequireAuth>
                   <AuthenticatedLayout>
                     <PrdPromptPage />
+                  </AuthenticatedLayout>
+                </RequireAuth>
+              }
+            />
+
+            <Route
+              path="/motor-proprio"
+              element={
+                <RequireAuth>
+                  <AuthenticatedLayout>
+                    <MotorProprioPage />
+                  </AuthenticatedLayout>
+                </RequireAuth>
+              }
+            />
+
+            <Route
+              path="/gerador-logos"
+              element={
+                <RequireAuth>
+                  <AuthenticatedLayout>
+                    <GeradorLogosPage />
                   </AuthenticatedLayout>
                 </RequireAuth>
               }
