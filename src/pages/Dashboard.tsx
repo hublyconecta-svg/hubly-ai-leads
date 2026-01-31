@@ -153,7 +153,7 @@ const DashboardPage = () => {
               <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
                 Dashboard
               </h1>
-              <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+              <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground font-bold">
                 Bem-vindo{user?.email ? `, ${user.email}` : ""}. Acompanhe a
                 performance das suas campanhas e do funil de leads em tempo
                 real.
@@ -186,7 +186,7 @@ const DashboardPage = () => {
 
         <main className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           <div className="glass-card animate-fade-in">
-            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground/70 mx-[5px] px-[5px]">
+            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground/70 mx-[5px] px-[5px] font-extrabold">
                        Leads gerados
             </p>
             <p className="mt-3 font-mono text-3xl font-semibold text-primary mx-[5px]">
@@ -197,7 +197,7 @@ const DashboardPage = () => {
             </p>
           </div>
           <div className="glass-card animate-fade-in [animation-delay:60ms]">
-            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground/70 mx-[5px] px-[5px]">
+            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground/70 mx-[5px] px-[5px] font-extrabold">
               Campanhas ativas
             </p>
             <p className="mt-3 font-mono text-3xl font-semibold text-secondary mx-[5px]">
